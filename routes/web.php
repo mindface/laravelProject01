@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskApiController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\ImageUploadController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,6 +28,9 @@ Route::middleware('auth')->group(function () {
   Route::post('/tasksapi', [TaskApiController::class, 'store'])->name('taskapi.store');
   Route::put('/tasksapi/{id}', [TaskApiController::class, 'update'])->name('taskapi.update');
   Route::delete('/tasksapi/{id}', [TaskApiController::class, 'destroy'])->name('taskapi.destroy');
+
+  Route::get('/upload', [ImageUploadController::class, 'uploadImages'])->name('uploadImages');
+  Route::post('/upload', [ImageUploadController::class, 'uploadImage'])->name('uploadImage');
 });
 
 require __DIR__.'/auth.php';

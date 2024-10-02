@@ -84,6 +84,22 @@ export class Api {
       console.log(error);
     }
     return [];
-  } 
+  }
+
+  static async getImagesApi() {
+    try {
+      const res = await fetch("/upload",{
+        method: "GET",
+        headers: this.getHeaders(),
+      });
+      const data = await res.json(); 
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+    return [];
+  }
+
 }
 
