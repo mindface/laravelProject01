@@ -17,16 +17,16 @@ class ImageUploadController extends Controller
       $imagePaths = [];
 
       foreach ($files as $file) {
-          $imagePaths[] = url('images/' . $file->getFilename());
+        $imagePaths[] = url('images/' . $file->getFilename());
       }
 
       return response()->json(json_decode(json_encode($imagePaths, JSON_UNESCAPED_SLASHES)), 200);
     } else {
-        return response()->json(['message' => '画像ディレクトリが存在しません'], 404);
+      return response()->json(['message' => '画像ディレクトリが存在しません'], 404);
     }
   }
 
-  public function uploadImage(Request $request)
+  public function _uploadImage(Request $request)
   {
     $validator = Validator::make($request->all(), [
       'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -40,8 +40,8 @@ class ImageUploadController extends Controller
       $imageName = time() . '.' . $image->getClientOriginalExtension();
       $image->move(public_path('images'), $imageName);
       Log::info('画像が正常にアップロードされました', [
-          'image_name' => $imageName,
-          'path' => public_path('images') . '/' . $imageName
+        'image_name' => $imageName,
+        'path' => public_path('images') . '/' . $imageName
       ]);
 
       return response()->json(['message' => '画像が正常にアップロードされました', 'image' => $imageName], 200);
@@ -49,4 +49,31 @@ class ImageUploadController extends Controller
 
     return response()->json(['message' => '画像のアップロードに失敗しました'], 400);
   }
+ 
+  public function uploadImage(Request $request)
+  {
+    $validator = Validator::make($request->all(), [
+      'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+    if ($validator->fails()) {
+      return response()->json(['errors' => $validator->errors()], 400);
+    }
+    $uploadedImages = [];
+    if($request->hasFile('images')) {
+      foreach ($request->file('images') as $image) {
+        $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('images'), $imageName);
+        $uploadedImages[] = [
+          'image_name' => $imageName,
+          'path' => public_path('images') . '/' . $imageName
+        ];
+        Log::info('画像が正常にアップロードされました', [
+          'image_name' => $imageName,
+          'path' => public_path('images') . '/' . $imageName
+        ]);
+      }
+      return response()->json(['message' => '画像が正常にアップロードされました', 'images' => $uploadedImages], 200);
+    }
+    return response()->json(['message' => '画像のアップロードに失敗しました'], 400);
+  }  
 }
